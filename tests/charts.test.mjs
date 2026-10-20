@@ -3,12 +3,13 @@ import assert from 'node:assert/strict';
 import { niceMax, linePoints, pathOf, polarPoint, wedgePath, perMinute } from '../src/charts.mjs';
 import { format, formatDecimal } from '../src/format.mjs';
 
-test('redondea el máximo del eje a 1, 2 o 5 por potencia de diez', () => {
+test('redondea el máximo del eje a 1, 2, 2,5 o 5 por potencia de diez', () => {
   assert.equal(niceMax(0), 1);
   assert.equal(niceMax(7), 10);
   assert.equal(niceMax(40), 50);
   assert.equal(niceMax(100), 100);
   assert.equal(niceMax(101), 200);
+  assert.equal(niceMax(209.9), 250);
 });
 
 test('coloca la línea de izquierda a derecha y desde la base', () => {

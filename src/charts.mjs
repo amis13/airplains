@@ -1,7 +1,7 @@
 export function niceMax(value) {
   if (!(value > 0)) return 1;
   const step = 10 ** Math.floor(Math.log10(value));
-  return [1, 2, 5, 10].map(m => m * step).find(m => m >= value);
+  return [1, 2, 2.5, 5, 10].map(m => m * step).find(m => m >= value);
 }
 export function linePoints(values, width, height, max = niceMax(Math.max(...values))) {
   const dx = values.length > 1 ? width / (values.length - 1) : 0;
