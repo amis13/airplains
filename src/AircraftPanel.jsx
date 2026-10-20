@@ -1,14 +1,24 @@
 import { Plane, Signal } from './Icons';
 import { format } from './format.mjs';
-export function AircraftPanel({ aircraft, allCount, query, onQuery, selected, onSelect, feed, demo, messages }) {
+import { ReceptionPanel } from './ReceptionPanel';
+const TABS = [['aircraft', 'Aviones'], ['reception', 'Recepción']];
+export function AircraftPanel({ aircraft, allCount, positionedCount, query, onQuery, selected, onSelect, feed, demo, messages, tab, onTab, stats, chain, error }) {
   const current = aircraft.find(a => a.hex === selected);
-  return <aside className="aircraft-panel" aria-label="Lista de aviones">
+  function onTabKey(e) {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    const index = TABS.findIndex(([id]) => id === tab), next = TABS[(index + (e.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length][0];
+    onTab(next);
+    document.getElementById(`tab-${next}`).focus();
+  }
+  return <aside className="aircraft-panel" aria-label="Panel de aviones y recepción">
+    <div className="panel-tabs" role="tablist" aria-label="Vista del panel" onKeyDown={onTabKey}>{TABS.map(([id, label]) => <button key={id} id={`tab-${id}`} role="tab" aria-selected={tab === id} aria-controls={`tabpanel-${id}`} tabIndex={tab === id ? 0 : -1} className="panel-tab" onClick={() => onTab(id)}>{label}</button>)}</div>
+    {tab === 'reception' ? <ReceptionPanel demo={demo} error={error} stats={stats} chain={chain} total={allCount} positioned={positionedCount}/> : <div className="tab-body" role="tabpanel" id="tabpanel-aircraft" aria-labelledby="tab-aircraft">
     <div className="panel-heading"><h1>Aviones <span>({allCount})</span></h1><span className="panel-count">{aircraft.filter(a => a.lat != null).length} en mapa</span></div>
     <div className="search-wrap"><span aria-hidden="true">⌕</span><input aria-label="Buscar vuelo o ICAO" type="search" placeholder="Buscar vuelo o ICAO" value={query} onChange={e => onQuery(e.target.value)}/></div>
     <div className="aircraft-scroll">
       {aircraft.length ? <><div className="list-labels"><span>Vuelo / ICAO</span><span>Altitud · ft</span></div><ul className="aircraft-list">{aircraft.map(a => <li key={a.hex}><button aria-pressed={a.hex === selected} onClick={() => onSelect(a.hex)} className={`aircraft-row ${a.hex === selected ? 'active' : ''}`}><Plane size={20}/><span><strong>{a.callsign || a.hex}</strong><small>{a.hex} {a.lat == null ? '· sin posición' : ''}</small></span><span className="altitude">{format(a.altitude)}<small>{format(a.speed)} kt</small></span></button></li>)}</ul></> : <div className="empty-state"><Plane size={52}/><h2>{query ? 'Sin coincidencias' : 'Aún no hay aviones'}</h2><p>{query ? 'Prueba con otro vuelo o código ICAO.' : 'Los vuelos recibidos aparecerán aquí.'}</p>{query && <button className="button" onClick={() => onQuery('')}>Limpiar búsqueda</button>}</div>}
       {current && <section className="flight-detail" aria-label="Detalles del avión"><div className="detail-title"><h2>{current.callsign || current.hex}</h2><button className="icon-button" aria-label="Cerrar detalles del avión" onClick={() => onSelect(null)}>×</button></div><p className="muted">{demo ? 'Vuelo simulado' : 'Datos recibidos por ADS-B'}</p><dl><div><dt>Altitud</dt><dd>{format(current.altitude)} ft</dd></div><div><dt>Velocidad</dt><dd>{format(current.speed)} kt</dd></div><div><dt>Rumbo</dt><dd>{format(current.track)}°</dd></div><div><dt>Último mensaje</dt><dd>{format(current.seen)} s</dd></div><div><dt>Ascenso / descenso</dt><dd>{format(current.verticalRate)} ft/min</dd></div><div><dt>Squawk</dt><dd>{current.squawk || '—'}</dd></div></dl><p className="coordinates">{current.lat == null ? 'Sin posición reciente. Se oculta del mapa tras 30 s.' : `${current.lat.toFixed(4)}°, ${current.lon.toFixed(4)}°`}</p></section>}
-    </div>
+    </div></div>}
     <div className="receiver-summary"><Signal size={29}/><div><strong>{demo ? 'Demostración · ADS-B' : 'Pluto+ · ADS-B'}</strong><p className="source">{demo ? 'Datos simulados, sin recepción RF' : `SBS ${feed?.source || '127.0.0.1:30003'}`}</p><p>{format(messages)} mensajes · actualización cada segundo</p></div></div>
   </aside>;
 }
