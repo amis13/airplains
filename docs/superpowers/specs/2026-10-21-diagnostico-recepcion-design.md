@@ -95,7 +95,7 @@ chain: { plutoHost, steps, firstFailure }          // plutoHost = probe.status()
   3. **Alcance**: `max` NM y `maxHex`; gráfico polar SVG de 16 sectores con anillos de distancia, norte arriba, etiquetas N/E/S/O. Sin `range`: «Configura RECEIVER_LAT y RECEIVER_LON en .env para medir el alcance».
 - Demo: la pestaña muestra «La demostración no simula recepción RF» y ninguna métrica.
 - Servidor sin conexión: solo el aviso de error existente; ninguna métrica antigua.
-- Cabecera: nuevo estado «Pluto no accesible» cuando `!feed.connected && chain.firstFailure === 'pluto-iio'`; el resto de estados no cambia.
+- Cabecera: nuevo estado «Pluto no accesible» cuando `!feed.connected` y `chain.firstFailure` es `pluto-http` o `pluto-iio` (si ambos puertos fallan, el primer fallo es `pluto-http`); el resto de estados no cambia.
 - `ReceiverDialog`: una línea que remite a la pestaña Recepción.
 - Estilos con los tokens existentes de `src/styles.css`; línea del gráfico en el acento; sin gradientes. Cargar la skill `dataviz` antes de escribir los gráficos.
 
