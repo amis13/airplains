@@ -1,5 +1,5 @@
 import { Plane, Signal } from './Icons';
-const format = value => value == null ? '—' : new Intl.NumberFormat('es-ES', { maximumFractionDigits: 0 }).format(value);
+import { format } from './format.mjs';
 export function AircraftPanel({ aircraft, allCount, query, onQuery, selected, onSelect, feed, demo, messages }) {
   const current = aircraft.find(a => a.hex === selected);
   return <aside className="aircraft-panel" aria-label="Lista de aviones">
