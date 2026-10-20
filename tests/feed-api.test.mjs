@@ -5,6 +5,7 @@ import net from 'node:net';
 import { AircraftStore } from '../server/aircraft.mjs';
 import { SbsFeed } from '../server/feed.mjs';
 import { createApp } from '../server/index.mjs';
+import { ReceptionStats } from '../server/stats.mjs';
 
 const line = 'MSG,3,1,1,ABC123,1,,,,,TEST123,32000,,,40.4,-3.7,,,,,,\r\n';
 class Socket extends EventEmitter {
@@ -14,7 +15,8 @@ class Socket extends EventEmitter {
 test('reconstruye mensajes SBS fragmentados, publica la API y reconecta', async t => {
   const sockets = [];
   t.mock.method(net, 'createConnection', () => { const socket = new Socket(); sockets.push(socket); return socket; });
-  const store = new AircraftStore(), feed = new SbsFeed(store, { retryMs: 5 });
+  const stats = new ReceptionStats({ receiver: [40, -3] });
+  const store = new AircraftStore({ onPosition: (hex, lat, lon) => stats.position(hex, lat, lon) }), feed = new SbsFeed(store, { retryMs: 5, stats });
   t.after(() => feed.stop());
   feed.start();
   sockets[0].emit('connect');
@@ -22,7 +24,7 @@ test('reconstruye mensajes SBS fragmentados, publica la API y reconecta', async 
   assert.equal(store.messages, 0);
   sockets[0].emit('data', line.slice(25) + line);
   assert.equal(store.messages, 2);
-  const app = createApp({ store, feed, receiver: [40, -3] });
+  const app = createApp({ store, feed, stats, receiver: [40, -3] });
   t.after(() => app.close());
   const result = await request(app, '/api/aircraft');
   assert.equal(result.status, 200);
@@ -32,6 +34,14 @@ test('reconstruye mensajes SBS fragmentados, publica la API y reconecta', async 
   assert.equal(data.aircraft[0].lat, 40.4);
   assert.deepEqual(data.receiver, [40, -3]);
   assert.equal(result.headers['Cache-Control'], 'no-store');
+  assert.equal(data.stats.valid, 2);
+  assert.equal(data.stats.invalid, 0);
+  assert.equal(data.stats.history.length, 300);
+  assert.equal(data.stats.range.maxHex, 'ABC123');
+  assert.equal(data.stats.range.sectors[14], 40.1);
+  assert.equal(data.chain.plutoHost, null);
+  assert.deepEqual(data.chain.steps.map(s => s.state), ['unknown', 'unknown', 'ok', 'ok']);
+  assert.equal(data.chain.firstFailure, null);
   sockets[0].destroy(Object.assign(new Error('refused'), { code: 'ECONNREFUSED' }));
   assert.equal(feed.status().connected, false);
   await new Promise(resolve => setTimeout(resolve, 20));

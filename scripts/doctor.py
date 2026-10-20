@@ -12,9 +12,6 @@ import sys
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--pluto', default=os.getenv('PLUTO_HOST', '192.168.2.1'))
-    args = parser.parse_args()
     config = {}
     env_file = Path(__file__).resolve().parents[1] / '.env'
     if env_file.exists():
@@ -22,6 +19,9 @@ def main():
             if '=' in line and not line.lstrip().startswith('#'):
                 key, value = line.split('=', 1)
                 config[key.strip()] = value.strip().strip('\"\'')
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--pluto', default=os.getenv('PLUTO_HOST') or config.get('PLUTO_HOST') or '192.168.2.1')
+    args = parser.parse_args()
     host = os.getenv('SBS_HOST', config.get('SBS_HOST', '127.0.0.1'))
     try:
         port = int(os.getenv('SBS_PORT', config.get('SBS_PORT', '30003')))

@@ -11,7 +11,7 @@ export function useAircraft() {
         const response = await fetch('/api/aircraft', { signal: controller.signal, cache: 'no-store' });
         if (!response.ok) throw new Error('No se puede consultar el receptor');
         const data = await response.json();
-        if (!Array.isArray(data.aircraft) || !data.feed) throw new Error('Respuesta del receptor no válida');
+        if (!Array.isArray(data.aircraft) || !data.feed || !data.stats || !data.chain) throw new Error('Respuesta del receptor no válida');
         if (active) setState({ data, error: null, loading: false });
       } catch {
         if (active) setState({ data: null, error: 'No se puede conectar con el servidor local. Comprueba que npm run dev o npm start sigue en ejecución.', loading: false });
