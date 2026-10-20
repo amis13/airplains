@@ -1,10 +1,11 @@
 const number = value => typeof value === 'string' && value.trim() !== '' && Number.isFinite(Number(value)) ? Number(value) : null;
 
 export class AircraftStore {
-  constructor({ ttl = 120_000, positionTtl = 30_000, maxAircraft = 2000 } = {}) {
+  constructor({ ttl = 120_000, positionTtl = 30_000, maxAircraft = 2000, onPosition = null } = {}) {
     this.ttl = ttl;
     this.positionTtl = positionTtl;
     this.maxAircraft = maxAircraft;
+    this.onPosition = onPosition;
     this.aircraft = new Map();
     this.messages = 0;
     this.lastMessageAt = null;
@@ -35,6 +36,7 @@ export class AircraftStore {
         if (a.trail.length > 100) a.trail.shift();
       }
       a.lat = lat; a.lon = lon; a.positionAt = now;
+      this.onPosition?.(hex, lat, lon, now);
     }
     a.seenAt = now;
     a.messages++;

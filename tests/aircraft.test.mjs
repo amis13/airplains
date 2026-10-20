@@ -56,3 +56,12 @@ test('rechaza datos malformados y acota el número de aviones', () => {
   assert.equal(store.messages, 3);
   assert.deepEqual(store.snapshot(1000).map(a => a.hex), ['000002', '000003']);
 });
+
+test('notifica solo las posiciones válidas', () => {
+  const calls = [];
+  const store = new AircraftStore({ onPosition: (...args) => calls.push(args) });
+  store.ingest(message({ lat: '40.4', lon: '-3.7' }), 1000);
+  store.ingest(message({ lat: '91', lon: '-3.7' }), 2000);
+  store.ingest(message({ speed: '400' }), 3000);
+  assert.deepEqual(calls, [['ABC123', 40.4, -3.7, 1000]]);
+});

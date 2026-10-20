@@ -62,6 +62,17 @@ test('la API rechaza escritura, rutas desconocidas y escapes del directorio est�
   assert.equal((await request(app, '/%FF')).status, 400);
 });
 
+test('cuenta líneas válidas y descartadas e ignora las vacías', t => {
+  const socket = new Socket();
+  t.mock.method(net, 'createConnection', () => socket);
+  const recorded = [];
+  const feed = new SbsFeed(new AircraftStore(), { stats: { record: valid => recorded.push(valid) } });
+  t.after(() => feed.stop());
+  feed.start(); socket.emit('connect');
+  socket.emit('data', line + 'basura\r\n\r\n' + 'x'.repeat(2100) + '\n');
+  assert.deepEqual(recorded, [true, false, false]);
+});
+
 function request(app, url, method = 'GET') {
   return new Promise(resolve => {
     const response = { headers: {}, status: 200, setHeader(k, v) { this.headers[k] = v; }, writeHead(status, headers = {}) { this.status = status; Object.assign(this.headers, headers); }, end(body = '') { resolve({ status: this.status, headers: this.headers, body: body.toString() }); } };
