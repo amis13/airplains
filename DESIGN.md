@@ -21,6 +21,9 @@ Arial/Helvetica para controles y contenido; Consolas/Liberation Mono para identi
 - Empty state, sin coincidencias, servidor desconectado, decodificador conectado sin mensajes y demo son estados distintos.
 - Posiciones caducan a los 30 s; aviones a los 120 s. Traza acotada a 100 posiciones. Fuente SBS fija en configuración local del servidor.
 - Unidades de aviación explícitas: ft, kt, grados y ft/min. Valores desconocidos se muestran como raya.
+- Pestañas del panel: App; Aviones por defecto, no persistida, flechas para cambiar. Recepción muestra cadena (`server/chain.mjs`), ritmo y alcance (`server/stats.mjs`). En demo no muestra métricas; con el servidor caído, solo el error.
+- Estados de la cadena: correcto, aviso, fallo y sin comprobar, siempre con icono y texto además del color (#0ca30c, #fab219, #d03b3b, #92a3b3). Estos colores no se usan en gráficos. El primer fallo se destaca con fondo rojo claro y su consejo.
+- Gráficos SVG propios en `src/ReceptionCharts.jsx`: una serie, sin leyenda; línea de 2 px en el acento con relleno al 10 %; cuñas polares con hueco de 2 px en color de superficie; escala a 1, 2, 2,5 o 5 por potencia de diez; tooltip por puntero y teclado; tabla equivalente en un desplegable.
 
 ## Verificación
 

@@ -79,6 +79,16 @@ En `.env`, `SBS_HOST` y `SBS_PORT` indican dónde corre **el decodificador**, no
 
 `RECEIVER_LAT` y `RECEIVER_LON` son opcionales: introduce ambas para situar tu antena. Sin ellas, el mapa abre Madrid como vista inicial y lo indica; no utiliza geolocalización ni afirma haber detectado tu ubicación.
 
+### Pestaña Recepción
+
+El panel lateral tiene una pestaña **Recepción** para ajustar la antena sin perder el mapa de vista:
+
+- **Cadena de recepción:** Pluto web (:80), Pluto IIO (:30431), decodificador SBS y mensajes ADS-B. Se destaca el primer paso que falla con una indicación. Si llegan mensajes, un fallo al sondear el Pluto se muestra como aviso: el decodificador puede estar en otro equipo o en el propio Pluto.
+- **Mensajes por segundo:** media de los últimos 10 s, gráfico de los últimos 5 minutos, porcentaje de líneas válidas, aviones y aviones con posición.
+- **Alcance:** máximo de la sesión en millas náuticas (NM) y máximo por sector de 22,5°. Requiere `RECEIVER_LAT` y `RECEIVER_LON`. Se ignoran posiciones a más de 400 NM, que suelen ser errores de decodificación.
+
+El servidor sondea `PLUTO_HOST` (por defecto `192.168.2.1`) cada 10 segundos: abre y cierra una conexión TCP a los puertos 80 y 30431 sin enviar datos. Deja `PLUTO_HOST=` vacío para desactivarlo. `npm run doctor` usa también este valor. Las estadísticas se reinician con el servidor. La demostración no simula recepción y no muestra estas métricas.
+
 ## Estados de los datos
 
 - Actualización de la interfaz aproximadamente cada segundo; reconexión SBS cada tres segundos.
@@ -95,6 +105,6 @@ npm test
 npm run build
 ```
 
-Las pruebas cubren mensajes SBS parciales y fragmentados, conservación de valores desconocidos y ceros, caducidad independiente de posición y avión, límites de memoria, reconexión, API y proyección geográfica. Las pruebas del transporte pueden usar un socket simulado para ejecutarse en entornos que bloqueen la apertura de puertos. No sustituyen una prueba de recepción RF con el Pluto+ físico.
+Las pruebas cubren mensajes SBS parciales y fragmentados, conservación de valores desconocidos y ceros, caducidad independiente de posición y avión, límites de memoria, reconexión, API, proyección geográfica, estadísticas de recepción, sondeo del Pluto, diagnóstico de la cadena y geometría de los gráficos. Las pruebas del transporte pueden usar un socket simulado para ejecutarse en entornos que bloqueen la apertura de puertos. No sustituyen una prueba de recepción RF con el Pluto+ físico.
 
 La primera implementación se construyó en un entorno que bloquea la red, la apertura de puertos y la comunicación con Windows. Se usaron dependencias ya disponibles localmente. La compilación y las pruebas sin hardware se verifican por separado; la captura real, el acceso desde Windows y la cartografía en línea requieren verificación en tu equipo.
