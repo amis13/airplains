@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { niceMax, linePoints, pathOf, polarPoint, wedgePath, perMinute } from '../src/charts.mjs';
+import { niceMax, linePoints, pathOf, polarPoint, wedgePath, perMinute, ringLabels } from '../src/charts.mjs';
 import { format, formatDecimal } from '../src/format.mjs';
 
 test('redondea el máximo del eje a 1, 2, 2,5 o 5 por potencia de diez', () => {
@@ -47,4 +47,10 @@ test('formatea en español con raya para desconocidos', () => {
   assert.equal(format(12345), '12.345');
   assert.equal(formatDecimal(41.25), '41,3');
   assert.equal(formatDecimal(undefined), '—');
+});
+
+test('las etiquetas de los anillos polares no redondean a enteros', () => {
+  assert.deepEqual(ringLabels(25), ['12,5', '25']);
+  assert.deepEqual(ringLabels(2.5), ['1,25', '2,5']);
+  assert.deepEqual(ringLabels(1), ['0,5', '1']);
 });

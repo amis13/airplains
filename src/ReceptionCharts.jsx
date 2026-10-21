@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { niceMax, linePoints, pathOf, polarPoint, wedgePath, perMinute } from './charts.mjs';
+import { niceMax, linePoints, pathOf, polarPoint, wedgePath, perMinute, ringLabels } from './charts.mjs';
 import { format, formatDecimal } from './format.mjs';
 const W = 300, H = 96, R = 100;
 const SECTORS = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSO', 'SO', 'OSO', 'O', 'ONO', 'NO', 'NNO'];
@@ -41,13 +41,13 @@ export function RangeChart({ sectors }) {
     setHover(v => ((v ?? (step > 0 ? -1 : 0)) + step + n) % n);
   }
   return <figure className="chart">
-    <div className="polar" tabIndex={0} role="img" aria-label={`Alcance máximo por dirección; anillo exterior ${format(max)} NM. Usa las flechas para recorrer los sectores.`} onKeyDown={key} onBlur={() => setHover(null)} onPointerLeave={() => setHover(null)}>
+    <div className="polar" tabIndex={0} role="img" aria-label={`Alcance máximo por dirección; anillo exterior ${ringLabels(max)[1]} NM. Usa las flechas para recorrer los sectores.`} onKeyDown={key} onBlur={() => setHover(null)} onPointerLeave={() => setHover(null)}>
       <svg viewBox="-125 -125 250 250" aria-hidden="true">
         {[0.25, 0.5, 0.75, 1].map(f => <circle key={f} className="chart-grid" r={R * f}/>)}
         <line className="chart-grid" x1="0" y1={-R} x2="0" y2={R}/><line className="chart-grid" x1={-R} y1="0" x2={R} y2="0"/>
         {sectors.map((d, i) => <path key={i} className={`polar-wedge ${hover === i ? 'active' : ''}`} d={wedgePath(i, d, R, max, n)}/>)}
         {sectors.map((_, i) => <path key={i} className="polar-hit" d={wedgePath(i, max, R, max, n)} onPointerEnter={() => setHover(i)}/>)}
-        {[0.5, 1].map(f => <text key={f} className="polar-label" x="3" y={-R * f + 10}>{format(max * f)}</text>)}
+        {ringLabels(max).map((label, i) => <text key={i} className="polar-label" x="3" y={-R * (i + 1) / 2 + 10}>{label}</text>)}
         {[['N', 0], ['E', 90], ['S', 180], ['O', 270]].map(([label, bearing]) => { const [x, y] = polarPoint(bearing, 113, R, R); return <text key={label} className="polar-compass" x={x} y={y} textAnchor="middle" dominantBaseline="middle">{label}</text>; })}
       </svg>
       {hover != null && <div className="chart-tooltip polar-tooltip"><strong>{describe(hover)}</strong><span>Sector {SECTORS[hover]}</span></div>}

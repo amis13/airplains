@@ -1,3 +1,4 @@
+import { formatAxis } from './format.mjs';
 export function niceMax(value) {
   if (!(value > 0)) return 1;
   const step = 10 ** Math.floor(Math.log10(value));
@@ -25,3 +26,4 @@ export function perMinute(history) {
     return { label: ago === 1 ? 'Último minuto' : `Hace ${ago}–${ago - 1} min`, mean: Math.round(block.reduce((a, b) => a + b, 0) / block.length * 10) / 10, max: Math.max(...block) };
   });
 }
+export const ringLabels = max => [max / 2, max].map(formatAxis);
