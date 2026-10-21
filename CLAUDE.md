@@ -29,7 +29,7 @@ bash scripts/setup-decoder.sh   # clone + patch + build PlutoSDR/dump1090 into v
 
 There is no linter or formatter configured. Config comes from `.env` (see `.env.example`), loaded via `node --env-file-if-exists=.env`: `SBS_HOST`/`SBS_PORT` (where the decoder runs, not the Pluto IIO address), `PORT`, `HOST`, optional `RECEIVER_LAT`/`RECEIVER_LON` (both or neither; default view is Madrid), `PLUTO_HOST` (default `192.168.2.1`; empty disables the probe; also read by `doctor`). The dev proxy is hard-coded to 3001 in `vite.config.js`.
 
-The repo lives on `/mnt/c` (Windows drive under WSL): Vite's file watcher does not see edits there, so restart `npm run dev` after changing `src/` instead of relying on HMR. The user often has their own `npm run dev` (3001/5173) and `dump1090` (30003) running; for verification run a separate server/Vite on other ports instead of killing theirs.
+When the repo is on a Windows drive mounted in WSL (`/mnt/c/...`), Vite's file watcher does not see edits, so restart `npm run dev` after changing `src/` instead of relying on HMR. A developer may already have `npm run dev` (3001/5173) and `dump1090` (30003) running; for verification start a separate server/Vite on other ports instead of stopping theirs.
 
 ## Architecture
 

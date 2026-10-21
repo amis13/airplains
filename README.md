@@ -16,7 +16,7 @@ La aplicación no captura IQ directamente: necesita un decodificador compatible.
 Requiere Node 20.19+ (o 22.12+) y npm, ejecutados dentro de WSL.
 
 ```bash
-cd /mnt/c/Users/amis13/Desktop/airplains
+cd airplains   # carpeta donde has clonado el repositorio
 npm install
 npm run dev
 ```
